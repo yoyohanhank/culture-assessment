@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yayasan Seribu Cita Bangsa - Culture & Simulation Assessment</title>
-    <!-- Menggunakan Tailwind CSS untuk desain eksterior yang rapi -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
@@ -105,7 +104,6 @@
 
         <!-- 2. TAMPILAN UTAMA WAWANCARA (ZONA VIDEO) -->
         <div id="interviewZone" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Sisi Kiri & Tengah: Pertanyaan & Tampilan Kontrol -->
             <div class="md:col-span-2 flex flex-col justify-between p-5 bg-gray-50 rounded-lg border border-gray-200 min-h-[440px]">
                 <div>
                     <div class="flex justify-between items-center border-b pb-2 mb-3">
@@ -122,7 +120,7 @@
                         <p id="guideEN" class="italic">Petunjuk English</p>
                     </div>
                 </div>
-                <div class="mt-4 p-3 bg-red-50 border border-red-100 text-red-800 rounded-lg text-xs font-medium flex items-center gap-2 animate-pulse">
+                <div class="mt-4 p-3 bg-red-50 border border-red-100 text-red-800 rounded-lg text-xs font-medium flex items-center gap-2">
                     <span>📢</span>
                     <p><b>Silakan langsung berbicara di depan kamera untuk menjawab.</b> Tidak perlu mengetik apa pun.</p>
                 </div>
@@ -137,7 +135,7 @@
             <div class="md:col-span-1 space-y-4">
                 <div class="relative bg-black rounded-lg overflow-hidden aspect-video md:aspect-square shadow-md flex items-center justify-center border-2 border-red-500">
                     <video id="webcamVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
-                    <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse flex items-center shadow">
+                    <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider flex items-center shadow">
                         <span class="w-1.5 h-1.5 bg-white rounded-full mr-1"></span> AUDIO & VIDEO RECORDING
                     </div>
                 </div>
@@ -149,15 +147,32 @@
             </div>
         </div>
 
-        <!-- 3. LAYAR SELESAI -->
-        <div id="finishScreen" class="hidden text-center py-12 space-y-4">
-            <div class="text-5xl">🎬</div>
-            <h2 class="text-xl font-bold text-gray-900">Wawancara Video Selesai & Berhasil Direkam!</h2>
-            <p class="text-sm text-gray-500 max-w-md mx-auto">Terima kasih <span id="displayFinalName" class="font-bold text-blue-700"></span>. Seluruh rekaman video respons lisan Anda untuk <b>Yayasan Seribu Cita Bangsa</b> telah diamankan di sistem.</p>
-            <div class="pt-4">
-                <button id="downloadBtn" class="px-5 py-3 bg-gray-800 hover:bg-gray-900 text-white text-xs font-semibold rounded-lg transition shadow-md">
-                    Unduh Rekaman Video (.webm) (Untuk Uji Coba Anda)
-                </button>
+        <!-- 3. LAYAR SUBMIT JAWABAN & SELESAI -->
+        <div id="finishScreen" class="hidden text-center py-12 space-y-6">
+            <div id="submitSection" class="space-y-4">
+                <div class="text-5xl">📝</div>
+                <h2 class="text-xl font-bold text-gray-900">Seluruh Pertanyaan Telah Selesai Dijawab</h2>
+                <p class="text-sm text-gray-500 max-w-md mx-auto">Klik tombol <b>SUBMIT</b> di bawah ini untuk mengirimkan hasil rekaman wawancara Anda langsung ke sistem kami.</p>
+                
+                <div class="pt-4">
+                    <button id="submitBtn" class="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-base rounded-xl shadow-lg transition tracking-wide uppercase">
+                        🚀 SUBMIT JAWABAN
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tampilan Loading & Sukses (Awalnya tersembunyi) -->
+            <div id="statusSection" class="hidden space-y-4">
+                <div id="statusIcon" class="text-5xl animate-bounce">⏳</div>
+                <h2 id="statusTitle" class="text-xl font-bold text-gray-900">Sedang Mengirim Video...</h2>
+                <p id="statusMessage" class="text-sm text-gray-500 max-w-md mx-auto">Mohon jangan menutup halaman ini sampai proses unggah selesai.</p>
+                
+                <div id="backupDownload" class="hidden pt-4 border-t max-w-sm mx-auto">
+                    <p class="text-xs text-red-500 mb-2 font-medium">Jika unggah otomatis terkendala jaringan, Anda bisa mengunduh file cadangannya di bawah ini:</p>
+                    <button id="downloadBtn" class="px-4 py-2.5 bg-gray-800 hover:bg-gray-900 text-white text-xs font-semibold rounded-lg transition shadow-md">
+                        📥 Unduh Rekaman Cadangan (.webm)
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -165,7 +180,6 @@
 
     <!-- LOGIKA UTAMA JAVASCRIPT -->
     <script>
-        // DATA PERTANYAAN AMAN (SUDAH DIPERBAIKI SINTAKSISNYA)
         const testBank = [
             {
                 section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
@@ -240,7 +254,7 @@
                 time: 480
             },
             {
-                section: "BAGIAN 3: REALISTIC WORK SIMULATION (30%)",
+                section: "BAGIAN 3: REALISTIC WORK CLASS SIMULATION (30%)",
                 title: "Exercise B: The Bad News Email (Verbal Presentation)",
                 id_q: "Ucapkan atau simulasikan draf pesan lisan/email yang ditujukan kepada CEO organisasi Anda yang menjelaskan bahwa sebuah proyek penting mengalami keterlambatan selama 2 minggu karena kesalahan yang tidak sengaja dilakukan oleh tim Anda.",
                 en_q: "Speak or simulate an email draft addressed to your CEO explaining that a major project is delayed by 2 weeks due to mistakes made by your team.",
@@ -290,14 +304,17 @@
         const checkScreen = document.getElementById('checkScreen');
         const interviewZone = document.getElementById('interviewZone');
         const finishScreen = document.getElementById('finishScreen');
+        const submitSection = document.getElementById('submitSection');
+        const statusSection = document.getElementById('statusSection');
+        
         const goToCheckBtn = document.getElementById('goToCheckBtn');
         const startInterviewBtn = document.getElementById('startInterviewBtn');
         const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
         const downloadBtn = document.getElementById('downloadBtn');
         
         const candidateName = document.getElementById('candidateName');
         const candidatePhone = document.getElementById('candidatePhone');
-        const displayFinalName = document.getElementById('displayFinalName');
 
         const timerContainer = document.getElementById('timerContainer');
         const timerLabel = document.getElementById('timerLabel');
@@ -332,7 +349,6 @@
                         const isCharging = battery.charging ? " (Charging)" : "";
                         const statusEl = document.getElementById('batteryStatus');
                         statusEl.textContent = `${level}%${isCharging}`;
-                        statusEl.className = level < 20 && !battery.charging ? "text-lg font-bold text-red-600 mt-2" : "text-lg font-bold text-green-600 mt-2";
                     }
                     updateBatteryInfo();
                 });
@@ -343,7 +359,6 @@
             const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
             if (connection) {
                 document.getElementById('networkStatus').textContent = `${connection.effectiveType.toUpperCase()} (~${connection.downlink} Mbps)`;
-                document.getElementById('networkStatus').className = "text-lg font-bold text-green-600 mt-2";
             } else {
                 document.getElementById('networkStatus').textContent = "Koneksi Aktif";
             }
@@ -396,7 +411,6 @@
             loadQuestionBlock();
         });
 
-        // Render Data Blok Pertanyaan Aktif
         function loadQuestionBlock() {
             clearInterval(questionTimer);
 
@@ -421,7 +435,7 @@
 
                 runQuestionCountdown();
             } else {
-                completeAssessment();
+                finishAssessmentZone();
             }
         }
 
@@ -450,7 +464,8 @@
             loadQuestionBlock();
         });
 
-        function completeAssessment() {
+        // Masuk Halaman Finish & Mematikan Kamera
+        function finishAssessmentZone() {
             clearInterval(questionTimer);
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
@@ -458,34 +473,58 @@
             }
             interviewZone.classList.add('hidden');
             timerContainer.classList.add('hidden');
-            displayFinalName.textContent = candidateName.value;
             finishScreen.classList.remove('hidden');
-
-            setTimeout(() => {
-                const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = function() {
-                    const base64String = reader.result.split(',')[1];
-                    const payload = {
-                        name: candidateName.value,
-                        phone: candidatePhone.value,
-                        videoBase64: base64String
-                    };
-
-                    const googleAppScriptURL = "https://script.google.com/macros/s/AKfycbwDWCGQnMfMp8kU162d6bJpuKszAxua_wi3GXrVMEp1O5APeIWxXFelSB7XgfekWn2Mpw/exec";
-
-                    fetch(googleAppScriptURL, {
-                        method: "POST",
-                        body: JSON.stringify(payload)
-                    })
-                    .then(res => res.json())
-                    .then(data => console.log("Upload Success:", data))
-                    .catch(err => console.error("Upload Error:", err));
-                };
-            }, 1000);
         }
 
+        // AKSI KETIKA TOMBOL SUBMIT DIKLIK
+        submitBtn.addEventListener('click', () => {
+            // Sembunyikan panel instruksi submit, tampilkan panel loading status
+            submitSection.classList.add('hidden');
+            statusSection.classList.remove('hidden');
+
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = function() {
+                const base64String = reader.result.split(',')[1];
+                const payload = {
+                    name: candidateName.value,
+                    phone: candidatePhone.value,
+                    videoBase64: base64String
+                };
+
+                // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
+                const googleAppScriptURL = "https://script.google.com/macros/s/AKfycbwDWCGQnMfMp8kU162d6bJpuKszAxua_wi3GXrVMEp1O5APeIWxXFelSB7XgfekWn2Mpw/exec";
+
+                fetch(googleAppScriptURL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === "success") {
+                        // JIKA BERHASIL MASUK DRIVE
+                        document.getElementById('statusIcon').textContent = "✅";
+                        document.getElementById('statusIcon').classList.remove('animate-bounce');
+                        document.getElementById('statusTitle').innerHTML = "Thank You! / Terima Kasih!";
+                        document.getElementById('statusMessage').innerHTML = `Halo <b>${candidateName.value}</b>, data respons lisan Anda telah berhasil diunggah langsung ke Google Drive sistem kami. Anda diperbolehkan menutup halaman ini.`;
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .catch(err => {
+                    // JIKA GAGAL UNGGAH JARINGAN
+                    console.error("Upload Error:", err);
+                    document.getElementById('statusIcon').textContent = "⚠️";
+                    document.getElementById('statusIcon').classList.remove('animate-bounce');
+                    document.getElementById('statusTitle').textContent = "Gagal Mengirim Otomatis";
+                    document.getElementById('statusMessage').textContent = "Koneksi terputus saat mengunggah video. Silakan klik tombol di bawah untuk mengunduh file cadangan Anda secara manual.";
+                    document.getElementById('backupDownload').classList.remove('hidden');
+                });
+            };
+        });
+
+        // Backup download manual jika submit API terkendala
         downloadBtn.addEventListener('click', () => {
             const blob = new Blob(recordedChunks, { type: 'video/webm' });
             const url = URL.createObjectURL(blob);
