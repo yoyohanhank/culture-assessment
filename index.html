@@ -165,7 +165,7 @@
 
     <!-- LOGIKA UTAMA JAVASCRIPT -->
     <script>
-        // DATA PERTANYAAN, PEMBAGIAN GRUP, DAN TIMING DURASI YANG BARU
+        // DATA PERTANYAAN AMAN (SUDAH DIPERBAIKI SINTAKSISNYA)
         const testBank = [
             {
                 section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
@@ -413,7 +413,6 @@
 
                 remainingTime = currentData.time;
                 
-                // Ubah label khusus jika memasuki paket simulasi 8 menit
                 if(currentData.time === 480) {
                     timerLabel.textContent = "Sisa Waktu Paket Simulasi";
                 } else {
@@ -462,7 +461,6 @@
             displayFinalName.textContent = candidateName.value;
             finishScreen.classList.remove('hidden');
 
-            // PROSES KIRIM OTOMATIS KE GOOGLE DRIVE 1000 DAYS FUND
             setTimeout(() => {
                 const blob = new Blob(recordedChunks, { type: 'video/webm' });
                 const reader = new FileReader();
@@ -475,7 +473,6 @@
                         videoBase64: base64String
                     };
 
-                    // PASTE URL WEB APP APPS SCRIPT ANDA DI BAWAH INI
                     const googleAppScriptURL = "https://script.google.com/macros/s/AKfycbwDWCGQnMfMp8kU162d6bJpuKszAxua_wi3GXrVMEp1O5APeIWxXFelSB7XgfekWn2Mpw/exec";
 
                     fetch(googleAppScriptURL, {
@@ -489,7 +486,6 @@
             }, 1000);
         }
 
-        // Fitur Unduh Manual untuk testing lokal jika diperlukan
         downloadBtn.addEventListener('click', () => {
             const blob = new Blob(recordedChunks, { type: 'video/webm' });
             const url = URL.createObjectURL(blob);
