@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yayasan Seribu Cita Bangsa - Culture & Simulation Assessment</title>
+    <!-- Menggunakan Tailwind CSS untuk desain eksterior yang rapi -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <div class="max-w-4xl mx-auto my-10 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+        
+        <!-- HEADER UTAMA YAYASAN -->
+        <div class="border-b pb-4 mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold text-blue-700">Yayasan Seribu Cita Bangsa</h1>
+                <p class="text-xs text-gray-500 font-bold tracking-wide uppercase">Culture & Simulation Assessment</p>
+            </div>
+            <!-- Timer Per Pertanyaan -->
+            <div id="timerContainer" class="p-2 px-4 bg-red-50 border border-red-100 rounded-lg text-center hidden">
+                <span id="timerLabel" class="text-[10px] text-red-500 block font-bold uppercase tracking-wider">Sisa Waktu Bicara</span>
+                <span id="timerDisplay" class="text-xl font-extrabold text-red-600">00:00</span>
+            </div>
+        </div>
+
+        <!-- 1. LAYAR REGISTRASI DATA DIRI & PETUNJUK -->
+        <div id="setupScreen" class="space-y-6">
+            <div class="bg-blue-50 p-4 rounded-lg text-sm space-y-4">
+                <p class="font-medium text-blue-900"><b>[ID]</b> Selamat datang di tahap evaluasi lisan otomatis. Asesmen ini dirancang untuk memahami cara Anda berpikir, memecahkan masalah, dan menyelaraskan diri dengan nilai-nilai budaya kerja Yayasan Seribu Cita Bangsa.</p>
+                <p class="font-medium text-blue-900"><b>[EN]</b> <i>Welcome to the automated oral assessment. This test is designed to understand your way of thinking, problem-solving approach, and alignment with the core cultural values of Yayasan Seribu Cita Bangsa.</i></p>
+            </div>
+
+            <!-- Form Input Data Diri -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
+                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Data Diri Kandidat / Candidate Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Lengkap / Full Name *</label>
+                        <input type="text" id="candidateName" class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-400 outline-none text-sm" placeholder="Contoh: Budi Santoso" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">No. HP (WhatsApp) *</label>
+                        <input type="tel" id="candidatePhone" class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-400 outline-none text-sm" placeholder="Contoh: 08123456789" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center pt-2">
+                <button id="goToCheckBtn" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition text-sm">
+                    Lanjut ke Pengecekan Sistem (Device Check) →
+                </button>
+            </div>
+        </div>
+
+        <!-- 1B. LAYAR DEVICE & SYSTEM CHECK -->
+        <div id="checkScreen" class="hidden space-y-6">
+            <h2 class="text-lg font-bold text-gray-900 border-b pb-2">Pengecekan Kesiapan Perangkat / Device Readiness Check</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Status Baterai -->
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-gray-500 uppercase">1. Status Baterai</span>
+                        <div id="batteryStatus" class="text-lg font-bold text-gray-800 mt-2">Mengecek...</div>
+                    </div>
+                    <p id="batteryWarning" class="text-[11px] text-gray-400 mt-2">Pastikan daya perangkat cukup selama tes.</p>
+                </div>
+
+                <!-- Status Jaringan Internet -->
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-gray-500 uppercase">2. Kekuatan Jaringan</span>
+                        <div id="networkStatus" class="text-lg font-bold text-gray-800 mt-2">Mengecek...</div>
+                    </div>
+                    <p id="networkWarning" class="text-[11px] text-gray-400 mt-2">Gunakan Wi-Fi atau sinyal seluler yang stabil.</p>
+                </div>
+
+                <!-- Cek Audio/Mikrofon -->
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-gray-500 uppercase">3. Tes Audio / Mikrofon</span>
+                        <div class="text-sm font-medium text-gray-700 mt-2">Silakan bersuara/bicara:</div>
+                        <div class="w-full bg-gray-200 h-4 rounded-full overflow-hidden mt-2 border">
+                            <div id="audioBar" class="bg-green-500 h-full w-0 transition-all duration-75"></div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-gray-500 mt-2">Bar hijau akan bergerak jika mikrofon menangkap suara Anda.</p>
+                </div>
+            </div>
+
+            <!-- Kamera Preview Sebelum Mulai -->
+            <div class="max-w-md mx-auto bg-black rounded-lg overflow-hidden aspect-video relative border">
+                <video id="previewVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
+                <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded">Preview Kamera</div>
+            </div>
+
+            <div class="text-center pt-4 border-t">
+                <p class="text-xs text-gray-500 mb-3">Mohon konfirmasi semua perangkat di atas berfungsi baik sebelum memulai wawancara.</p>
+                <button id="startInterviewBtn" class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-md transition text-sm">
+                    Perangkat Siap, Mulai Wawancara Sekarang 🎬
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. TAMPILAN UTAMA WAWANCARA (ZONA VIDEO) -->
+        <div id="interviewZone" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Sisi Kiri & Tengah: Pertanyaan & Tampilan Kontrol -->
+            <div class="md:col-span-2 flex flex-col justify-between p-5 bg-gray-50 rounded-lg border border-gray-200 min-h-[440px]">
+                <div>
+                    <div class="flex justify-between items-center border-b pb-2 mb-3">
+                        <span id="sectionBadge" class="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-0.5 rounded">BAGIAN 2: BEHAVIORAL</span>
+                        <span id="questionCounter" class="text-xs font-medium text-gray-500">Pertanyaan 1 dari 12</span>
+                    </div>
+                    <h3 id="questionTitle" class="text-base font-bold text-gray-900 leading-snug">Judul Pertanyaan</h3>
+                    <div class="mt-3 space-y-3 text-sm">
+                        <p id="questionID" class="text-gray-800 font-medium bg-white p-3 rounded border border-gray-100 shadow-sm leading-relaxed">Soal Indonesia</p>
+                        <p id="questionEN" class="text-gray-650 italic bg-white p-3 rounded border border-gray-100 shadow-sm leading-relaxed">Soal English</p>
+                    </div>
+                    <div class="mt-3 p-2.5 bg-orange-50 border border-orange-100 rounded text-xs text-orange-800 space-y-1">
+                        <p id="guideID">Petunjuk Indo</p>
+                        <p id="guideEN" class="italic">Petunjuk English</p>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-red-50 border border-red-100 text-red-800 rounded-lg text-xs font-medium flex items-center gap-2 animate-pulse">
+                    <span>📢</span>
+                    <p><b>Silakan langsung berbicara di depan kamera untuk menjawab.</b> Tidak perlu mengetik apa pun.</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-200">
+                    <button id="nextBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition text-sm shadow">
+                        Saya Sudah Selesai Berbicara, Lanjut Ke Soal Berikutnya →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sisi Kanan: Kamera Pengawas -->
+            <div class="md:col-span-1 space-y-4">
+                <div class="relative bg-black rounded-lg overflow-hidden aspect-video md:aspect-square shadow-md flex items-center justify-center border-2 border-red-500">
+                    <video id="webcamVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
+                    <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse flex items-center shadow">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full mr-1"></span> AUDIO & VIDEO RECORDING
+                    </div>
+                </div>
+                <div class="p-3 bg-gray-100 rounded-lg border text-[11px] text-gray-500 space-y-1.5">
+                    <p class="font-bold text-gray-700">Sistem Perekaman Otomatis:</p>
+                    <p>• Suara dan mimik wajah Anda sedang direkam penuh.</p>
+                    <p>• Jika waktu habis, rekaman akan otomatis terkunci dan berganti topik.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. LAYAR SELESAI -->
+        <div id="finishScreen" class="hidden text-center py-12 space-y-4">
+            <div class="text-5xl">🎬</div>
+            <h2 class="text-xl font-bold text-gray-900">Wawancara Video Selesai & Berhasil Direkam!</h2>
+            <p class="text-sm text-gray-500 max-w-md mx-auto">Terima kasih <span id="displayFinalName" class="font-bold text-blue-700"></span>. Seluruh rekaman video respons lisan Anda untuk <b>Yayasan Seribu Cita Bangsa</b> telah diamankan di sistem.</p>
+            <div class="pt-4">
+                <button id="downloadBtn" class="px-5 py-3 bg-gray-800 hover:bg-gray-900 text-white text-xs font-semibold rounded-lg transition shadow-md">
+                    Unduh Rekaman Video (.webm) (Untuk Uji Coba Anda)
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LOGIKA UTAMA JAVASCRIPT -->
+    <script>
+        // DATA PERTANYAAN, PEMBAGIAN GRUP, DAN TIMING DURASI YANG BARU
+        const testBank = [
+            // ==========================================
+            // BAGIAN 2: BEHAVIORAL (7 Soal @ 2 Menit/120 Detik)
+            // ==========================================
+            {
+                section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
+                title: "Pertanyaan 1 (Own the Mission)",
+                id_q: "Ceritakan tentang suatu momen ketika Anda melihat sebuah masalah yang secara teknis bukan merupakan tanggung jawab Anda. Apa yang Anda lakukan?",
+                en_q: "Tell me about a time when you saw a problem that technically wasn’t your responsibility. What did you do?",
+                id_g: "[ID] Jelaskan situasi masalahnya, tindakan konkret yang Anda ambil tanpa menunggu instruksi, dan hasil akhirnya. (Maksimal 2 Menit)",
+                en_g: "[EN] Describe the situation, the concrete actions you took without waiting for instructions, and the final outcome. (Max 2 Mins)",
+                time: 120 
+            },
+            {
+                section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
+                title: "Pertanyaan 2 (Own the Mission & Learn Relentlessly)",
+                id_q: "Ceritakan tentang kesalahan profesional terbesar yang pernah Anda buat. Apa yang terjadi? Apa yang Anda pelajari, dan perubahan konkret apa yang Anda terapkan setelahnya?",
+                en_q: "Tell me about your biggest professional mistake. What happened? What did you learn, and what concrete changes did you implement afterward?",
+                id_g: "[ID] Kami menghargai kerendahan hati dan akuntabilitas. Fokuslah pada tanggung jawab Anda dan perbaikan nyata setelahnya. (Maksimal 2 Menit)",
+                en_g: "[EN] We value humility and accountability. Focus on your personal responsibility and the tangible improvements made afterward. (Max 2 Mins)",
+                time: 120
+            },
+            {
+                section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
+                title: "Pertanyaan 3 (Speak with Candor & Integrity)",
+                id_q: "Ceritakan pengalaman saat Anda harus memberikan umpan balik (feedback) yang sulit atau sensitif kepada atasan atau rekan kerja Anda.",
+                en_q: "Tell me about a time you had to give difficult or sensitive feedback to your manager or a colleague.",
+                id_g: "[ID] Sebutkan: Apa yang sebenarnya Anda katakan? Apa yang Anda khawatirkan saat itu? Dan apa yang terjadi setelahnya? (Maksimal 2 Menit)",
+                en_g: "[EN] Please share: What exactly did you say? What were you afraid of? And what happened afterward? (Max 2 Mins)",
+                time: 120
+            },
+            {
+                section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
+                title: "Pertanyaan 4 (Win Together)",
+                id_q: "Ceritakan tentang seseorang yang sulit diajak bekerja sama yang pernah berkolaborasi dengan Anda. Jika kami mewawancarai orang tersebut hari ini, bagaimana ia akan mendeskripsikan diri Anda?",
+                en_q: "Tell me about someone difficult you had to work with. If we were to interview them today, how would they describe you?",
+                id_g: "[ID] Jawablah dengan jujur dan objektif dari sudut pandang mereka terhadap cara kerja Anda. (Maksimal 2 Menit)",
+                en_g: "[EN] Answer honestly and objectively from their perspective regarding your working style. (Max 2 Mins)",
+                time: 120
+            },
+            {
+                section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
+                title: "Pertanyaan 5 (Learn Relentlessly)",
+                id_q: "Ceritakan tentang suatu keyakinan atau asumsi kuat yang Anda pegang dalam pekerjaan, namun akhirnya terbukti salah. Bagaimana Anda menyadari hal itu dan apa tindakan Anda?",
+                en_q: "Tell me about a belief or strong assumption you held in your work that turned out to be wrong. How did you realize it, and what did you do?",
+                id_g: "[ID] Kami mencari kemampuan Anda untuk terus belajar dan beradaptasi secara fleksibel terhadap fakta baru. (Maksimal 2 Menit)",
+                en_g: "[EN] We are looking for your ability to continuously learn and flexibly adapt to new facts. (Max 2 Mins)",
+                time: 120
+            },
+            {
+                section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
+                title: "Pertanyaan 6 (Innovate for Impact)",
+                id_q: "Ceritakan tentang satu perbaikan atau inovasi proses yang Anda perkenalkan di tempat kerja terdahulu, yang dampaknya masih dirasakan/berjalan hingga hari ini.",
+                en_q: "Tell me about an improvement or process innovation you introduced in your previous workplace that still exists and has an impact today.",
+                id_g: "[ID] Sebutkan masalah nyata yang Anda selesaikan, metrik keberhasilan, dan bagaimana skalabilitasnya. (Maksimal 2 Menit)",
+                en_g: "[EN] Mention the actual problem solved, measurable success metrics, and its scalability. (Max 2 Mins)",
+                time: 120
+            },
+            {
+                section: "BAGIAN 2: BEHAVIORAL INTERVIEW (60%)",
+                title: "Pertanyaan 7 (Care Deeply)",
+                id_q: "Ceritakan tentang situasi ketika Anda melihat rekan kerja Anda sedang mengalami kesulitan (baik masalah performa kerja maupun masalah pribadi). Apa yang Anda lakukan?",
+                en_q: "Tell me about a situation when you noticed a colleague was struggling (either with performance or personal issues). What did you do?",
+                id_g: "[ID] Tunjukkan bagaimana pendekatan empati, cara Anda mendengarkan, atau bantuan nyata yang diberikan. (Maksimal 2 Menit)",
+                en_g: "[EN] Show your empathetic approach, how you listened, or the tangible support you provided. (Max 2 Mins)",
+                time: 120
+            },
+
+            // ==========================================
+            // BAGIAN 3: SIMULATION (Exercise A: Total 8 Menit/480 Detik untuk 5 Pertanyaan)
+            // ==========================================
+            {
+                section: "BAGIAN 3: REALISTIC WORK SIMULATION (30%)",
+                title: "Exercise A: The Ambiguous Assignment",
+                id_q: "Bayangkan Anda baru saja bergabung dengan organisasi kami.<br>• Satu implementasi program di daerah tertinggal terlambat dari jadwal.<br>• Manajer program sedang cuti mendadak.<br>• Laporan kepada donor/investor harus dikirimkan dalam 1 minggu ke depan.<br>• Tim lapangan melaporkan transportasi mendadak sangat sulit.<br>• Tim keuangan menyatakan anggaran operasional sudah habis.<br><br><b>Sebutkan secara lisan respons Anda terhadap 5 poin berikut ini:</b><br>1. Apa hal pertama yang Anda lakukan?<br>2. Siapa yang diajak bicara dahulu?<br>3. Informasi apa yang paling krusial dibutuhkan?<br>4. Apa yang dikomunikasikan ke pimpinan?<br>5. Risiko utama apa yang Anda khawatirkan?",
+                en_q: "Imagine you have just joined our organization.<br>• A district project implementation has fallen behind schedule.<br>• The program manager is on sudden leave.<br>• The donor report is due in exactly one week.<br>• The field team reports that transportation has become very difficult.<br>• The finance team states there is no remaining budget.<br><br><b>Please state your oral response to these 5 points:</b><br>1. What do you do first?<br>2. Who do you speak to first?<br>3. What crucial information do you need immediately?<br>4. What do you communicate to leadership?<br>5. What key risks concern you the most?",
+                id_g: "[ID] 📢 PENTING: Anda memiliki total waktu 8 Menit untuk membaca dan menjawab seluruh kelima pertanyaan di atas secara lisan tanpa terputus.",
+                en_g: "[EN] 📢 IMPORTANT: You have a total of 8 Minutes to read and answer all five questions orally in one go.",
+                time: 480 // 8 Menit
+            },
+
+            // ==========================================
+            // BAGIAN 3: SIMULATION (Exercise B: Bad News Email - Verbal 3 Menit/180 Detik)
+            // ==========================================
+            {
+                section: "BAGIAN 3: REALISTIC WORK SIMULATION (30%)",
+                title: "Exercise B: The Bad News Email (Verbal Presentation)",
+                id_q: "Ucapkan atau simulasikan draf pesan lisan/email yang ditujukan kepada CEO organisasi Anda yang menjelaskan bahwa sebuah proyek penting mengalami keterlambatan selama 2 minggu karena kesalahan yang tidak sengaja dilakukan oleh tim Anda.",
+                en_q: "Speak or simulate an email draft addressed to your CEO explaining that a major project is delayed by 2 weeks due to mistakes made by your team.",
+                id_g: "[ID] Sampaikan argumen secara verbal langsung ke kamera dengan intonasi yang bertanggung jawab tanpa terkesan melempar kesalahan. (Maksimal 3 Menit)",
+                en_g: "[EN] Deliver the response verbally to the camera using an accountable tone without shifting blame. (Max 3 Mins)",
+                time: 180 // 3 Menit
+            },
+
+            // ==========================================
+            // BAGIAN 4: REFLECTION EXERCISE (Masing-masing bagian A, B, C @ 3 Menit/180 Detik)
+            // ==========================================
+            {
+                section: "BAGIAN 4: REFLECTION EXERCISE (10%)",
+                title: "Refleksi Diri - Bagian A",
+                id_q: "Deskripsikan proyek yang paling membuat Anda bangga dalam perjalanan karir profesional Anda. Apa kontribusi pribadi terbesar ANDA di dalam kesuksesan proyek tersebut?",
+                en_q: "Describe a project you are most proud of in your professional career. What was YOUR personal contribution to its success?",
+                id_g: "[ID] Fokus pada tindakan nyata yang Anda lakukan secara mandiri. (Maksimal 3 Menit)",
+                en_g: "[EN] Focus on concrete actions taken by you independently. (Max 3 Mins)",
+                time: 180
+            },
+            {
+                section: "BAGIAN 4: REFLECTION EXERCISE (10%)",
+                title: "Refleksi Diri - Bagian B",
+                id_q: "Deskripsikan kegagalan profesional terbesar yang pernah Anda hadapi. Bagian mana dari kegagalan tersebut yang sepenuhnya merupakan tanggung jawab Anda pribadi?",
+                en_q: "Describe your biggest professional failure. What part of it was entirely your responsibility?",
+                id_g: "[ID] Kami menilai tingkat akuntabilitas dan kedewasaan profesional Anda. (Maksimal 3 Menit)",
+                en_g: "[EN] We evaluate your professional accountability and maturity. (Max 3 Mins)",
+                time: 180
+            },
+            {
+                section: "BAGIAN 4: REFLECTION EXERCISE (10%)",
+                title: "Refleksi Diri - Bagian C",
+                id_q: "Atasan atau Manajer seperti apa yang bisa mengeluarkan potensi terbaik Anda? Dan sebaliknya, karakter atasan seperti apa yang memicu performa terburuk Anda?",
+                en_q: "What kind of manager brings out your best work? And conversely, what kind of manager triggers your worst performance?",
+                id_g: "[ID] Jawablah dengan jujur berdasarkan pengalaman kerja aktual Anda terdahulu. (Maksimal 3 Menit)",
+                en_g: "[EN] Answer honestly based on your actual past work experiences. (Max 3 Mins)",
+                time: 180
+            }
+        ];
+
+        let currentIndex = 0;
+        let questionTimer;
+        let remainingTime = 0;
+        let mediaRecorder;
+        let recordedChunks = [];
+        let globalStream = null;
+        let audioContext, analyser, javascriptNode;
+
+        // DOM Elements
+        const setupScreen = document.getElementById('setupScreen');
+        const checkScreen = document.getElementById('checkScreen');
+        const interviewZone = document.getElementById('interviewZone');
+        const finishScreen = document.getElementById('finishScreen');
+        const goToCheckBtn = document.getElementById('goToCheckBtn');
+        const startInterviewBtn = document.getElementById('startInterviewBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        const candidateName = document.getElementById('candidateName');
+        const candidatePhone = document.getElementById('candidatePhone');
+        const displayFinalName = document.getElementById('displayFinalName');
+
+        const timerContainer = document.getElementById('timerContainer');
+        const timerLabel = document.getElementById('timerLabel');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const sectionBadge = document.getElementById('sectionBadge');
+        const questionCounter = document.getElementById('questionCounter');
+        const questionTitle = document.getElementById('questionTitle');
+        const questionID = document.getElementById('questionID');
+        const questionEN = document.getElementById('questionEN');
+        const guideID = document.getElementById('guideID');
+        const guideEN = document.getElementById('guideEN');
+        const webcamVideo = document.getElementById('webcamVideo');
+        const previewVideo = document.getElementById('previewVideo');
+
+        // Pindah Ke Layar Check Perangkat
+        goToCheckBtn.addEventListener('click', async () => {
+            if (!candidateName.value.trim() || !candidatePhone.value.trim()) {
+                alert("Harap isi Nama Lengkap dan No HP Anda terlebih dahulu!");
+                return;
+            }
+            setupScreen.classList.add('hidden');
+            checkScreen.classList.remove('hidden');
+            await runDeviceChecks();
+        });
+
+        // Deteksi Hardware Alat
+        async function runDeviceChecks() {
+            if (navigator.getBattery) {
+                navigator.getBattery().then(battery => {
+                    function updateBatteryInfo() {
+                        const level = Math.round(battery.level * 100);
+                        const isCharging = battery.charging ? " (Charging)" : "";
+                        const statusEl = document.getElementById('batteryStatus');
+                        statusEl.textContent = `${level}%${isCharging}`;
+                        statusEl.className = level < 20 && !battery.charging ? "text-lg font-bold text-red-600 mt-2" : "text-lg font-bold text-green-600 mt-2";
+                    }
+                    updateBatteryInfo();
+                });
+            } else {
+                document.getElementById('batteryStatus').textContent = "Aktif";
+            }
+
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            if (connection) {
+                document.getElementById('networkStatus').textContent = `${connection.effectiveType.toUpperCase()} (~${connection.downlink} Mbps)`;
+                document.getElementById('networkStatus').className = "text-lg font-bold text-green-600 mt-2";
+            } else {
+                document.getElementById('networkStatus').textContent = "Koneksi Aktif";
+            }
+
+            try {
+                globalStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                previewVideo.srcObject = globalStream;
+
+                window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
+                analyser = audioContext.createAnalyser();
+                let microphone = audioContext.createMediaStreamSource(globalStream);
+                javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+
+                analyser.smoothingTimeConstant = 0.3;
+                analyser.fftSize = 1024;
+                microphone.connect(analyser);
+                analyser.connect(javascriptNode);
+                javascriptNode.connect(audioContext.destination);
+
+                const audioBar = document.getElementById('audioBar');
+                javascriptNode.onaudioprocess = function() {
+                    let array = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(array);
+                    let values = 0;
+                    for (let i = 0; i < array.length; i++) { values += array[i]; }
+                    let average = values / array.length;
+                    audioBar.style.width = Math.min(100, Math.round(average * 2.5)) + '%';
+                }
+            } catch (err) {
+                alert("Akses kamera/mikrofon ditolak atau tidak ditemukan.");
+            }
+        }
+
+        // Mulai Wawancara Resmi
+        startInterviewBtn.addEventListener('click', () => {
+            if (javascriptNode) javascriptNode.onaudioprocess = null;
+            if (audioContext) audioContext.close();
+
+            webcamVideo.srcObject = globalStream;
+
+            mediaRecorder = new MediaRecorder(globalStream);
+            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+            mediaRecorder.start();
+
+            checkScreen.classList.add('hidden');
+            interviewZone.classList.remove('hidden');
+            timerContainer.classList.remove('hidden');
+
+            loadQuestionBlock();
+        });
+
+        // Render Data Blok Pertanyaan Aktif
+        function loadQuestionBlock() {
+            clearInterval(questionTimer);
+
+            if (currentIndex < testBank.length) {
+                const currentData = testBank[currentIndex];
+                
+                sectionBadge.textContent = currentData.section;
+                questionCounter.textContent = `Progress: ${currentIndex + 1} dari ${testBank.length}`;
+                questionTitle.textContent = currentData.title;
+                questionID.innerHTML = currentData.id_q;
+                questionEN.innerHTML = currentData.en_q;
+                guideID.textContent = currentData.id_g;
+                guideEN.textContent = currentData.en_g;
+
+                remainingTime = currentData.time;
+                
+                // Ubah label khusus jika memasuki paket simulasi 8 menit
+                if(currentData.time === 480) {
+                    timerLabel.textContent = "Sisa Waktu Paket Simulasi";
+                } else {
+                    timerLabel.textContent = "Sisa Waktu Bicara";
+                }
+
+                runQuestionCountdown();
+            } else {
+                completeAssessment();
+            }
+        }
+
+        function runQuestionCountdown() {
+            updateTimerDisplay();
+            questionTimer = setInterval(() => {
+                remainingTime--;
+                updateTimerDisplay();
+
+                if (remainingTime <= 0) {
+                    clearInterval(questionTimer);
+                    currentIndex++;
+                    loadQuestionBlock();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            let mins = Math.floor(remainingTime / 60);
+            let secs = remainingTime % 60;
+            timerDisplay.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex++;
+            loadQuestionBlock();
+        });
+
+        function completeAssessment() {
+            clearInterval(questionTimer);
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+                globalStream.getTracks().forEach(track => track.stop());
+            }
+            interviewZone.classList.add('hidden');
+            timerContainer.classList.add('hidden');
+            displayFinalName.textContent = candidateName.value;
+            finishScreen.classList.remove('hidden');
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Culture_Simulation_Assessment_${candidateName.value.replace(/\s+/g, '_')}.webm`;
+            a.click();
+        });
+    </script>
+</body>
+</html>
